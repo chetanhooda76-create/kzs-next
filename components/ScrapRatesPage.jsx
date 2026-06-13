@@ -30,7 +30,12 @@ const ScrapRatesPage = () => {
 
   const resolveImgSrc = (img) => {
     if (!img) return '/placeholder.png';
-    if (img.startsWith('http') || img.startsWith('/')) return img;
+    if (img.startsWith('http')) return img;
+    if (img.startsWith('/uploads') || img.startsWith('uploads/')) {
+      const slash = img.startsWith('/') ? '' : '/';
+      return `${API_BASE_URL}${slash}${img}`;
+    }
+    if (img.startsWith('/')) return img;
     return `${API_BASE_URL}/${img}`;
   };
 

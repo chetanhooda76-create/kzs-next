@@ -298,7 +298,16 @@ const AdminDashboard = () => {
     });
   };
 
-  const resolveImgSrc = (img) => (img.startsWith('http') ? img : `${API_BASE_URL}${img}`);
+  const resolveImgSrc = (img) => {
+    if (!img) return '/placeholder.png';
+    if (img.startsWith('http')) return img;
+    if (img.startsWith('/uploads') || img.startsWith('uploads/')) {
+      const slash = img.startsWith('/') ? '' : '/';
+      return `${API_BASE_URL}${slash}${img}`;
+    }
+    if (img.startsWith('/')) return img;
+    return `${API_BASE_URL}/${img}`;
+  };
 
   if (!isAuthenticated) return <AdminLogin onLogin={() => setIsAuthenticated(true)} />;
   if (loading) return <div className="p-20 text-center font-bold">Loading Admin Panel...</div>;
