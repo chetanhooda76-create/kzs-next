@@ -45,7 +45,7 @@ const Footer = () => {
         </div>
 
         <div className="pt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center text-sm text-gray-500">
-          <p>© 2024 KZS Malik. All rights reserved.</p>
+          <p>© 2026 KZS Malik. All rights reserved.</p>
           <div className="mt-4 md:mt-0 flex flex-row items-center gap-4">
             <Link href="/privacy-policy" className="hover:text-white transition-colors">Privacy Policy</Link>
             <span className="text-gray-700">|</span>
