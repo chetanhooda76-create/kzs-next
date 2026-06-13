@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import { MapPin, Loader2 } from 'lucide-react';
@@ -18,6 +18,24 @@ L.Icon.Default.mergeOptions({
   shadowUrl: markerShadow,
 });
 
+const PRESETS = [
+  { name: 'Delhi', coords: [28.6139, 77.2090] },
+  { name: 'Noida', coords: [28.5741, 77.3565] },
+  { name: 'Greater Noida', coords: [28.4744, 77.5030] },
+  { name: 'Gurgaon', coords: [28.4595, 77.0266] },
+  { name: 'Ghaziabad', coords: [28.6692, 77.4538] },
+];
+
+const ChangeView = ({ center }) => {
+  const map = useMap();
+  useEffect(() => {
+    if (center) {
+      map.setView(center, 13);
+    }
+  }, [center, map]);
+  return null;
+};
+
 const LocationMarker = ({ position, setPosition }) => {
   useMapEvents({
     click(e) {
@@ -32,6 +50,7 @@ const LocationMarker = ({ position, setPosition }) => {
 
 const MapModal = ({ isOpen, onClose, onConfirm }) => {
   const [position, setPosition] = useState(new L.LatLng(28.6139, 77.2090)); // Default to Delhi
+  const [mapCenter, setMapCenter] = useState([28.6139, 77.2090]);
   const [address, setAddress] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -87,8 +106,36 @@ const MapModal = ({ isOpen, onClose, onConfirm }) => {
           <button onClick={onClose} className="p-2 hover:bg-gray-200 rounded-full transition-colors text-gray-400">✕</button>
         </div>
 
+        {/* Quick Selection Presets */}
+        <div className="px-6 py-3.5 border-b border-gray-100 bg-white flex flex-wrap gap-2 items-center">
+          <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest mr-2 font-outfit">Select City:</span>
+          {PRESETS.map((city) => {
+            const isActive = Math.abs(position.lat - city.coords[0]) < 0.001 &&
+                             Math.abs(position.lng - city.coords[1]) < 0.001;
+            return (
+              <button
+                key={city.name}
+                type="button"
+                onClick={() => {
+                  const newPos = new L.LatLng(city.coords[0], city.coords[1]);
+                  setPosition(newPos);
+                  setMapCenter(city.coords);
+                }}
+                className={`px-4 py-1.5 rounded-full text-xs font-bold font-outfit transition-all duration-200 border ${
+                  isActive
+                    ? 'bg-primary text-white border-primary shadow-lg shadow-primary/20 scale-105'
+                    : 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100 hover:text-gray-900'
+                }`}
+              >
+                {city.name}
+              </button>
+            );
+          })}
+        </div>
+
         <div className="h-100 relative">
           <MapContainer center={[28.6139, 77.2090]} zoom={13} scrollWheelZoom={true} style={{ height: '100%', width: '100%' }}>
+            <ChangeView center={mapCenter} />
             <TileLayer
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
