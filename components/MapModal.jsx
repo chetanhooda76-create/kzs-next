@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
-import { MapPin, Loader2 } from 'lucide-react';
+import { MapPin, Loader2, Search } from 'lucide-react';
 
 // Fix for default marker icon
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
@@ -53,8 +53,42 @@ const MapModal = ({ isOpen, onClose, onConfirm }) => {
   const [mapCenter, setMapCenter] = useState([28.6139, 77.2090]);
   const [address, setAddress] = useState('');
   const [loading, setLoading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [suggestions, setSuggestions] = useState([]);
+  const [searching, setSearching] = useState(false);
 
-  
+  useEffect(() => {
+    if (searchQuery.trim().length < 3) {
+      setSuggestions([]);
+      return;
+    }
+
+    let isMounted = true;
+
+    const delayDebounceFn = setTimeout(async () => {
+      setSearching(true);
+      try {
+        const response = await fetch(
+          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}&limit=5&countrycodes=in`
+        );
+        const data = await response.json();
+        if (isMounted) {
+          setSuggestions(data);
+        }
+      } catch (error) {
+        console.error("Geocoding search error:", error);
+      } finally {
+        if (isMounted) {
+          setSearching(false);
+        }
+      }
+    }, 500);
+
+    return () => {
+      isMounted = false;
+      clearTimeout(delayDebounceFn);
+    };
+  }, [searchQuery]);
 
    useEffect(() => {
     if (!position) return;
@@ -104,6 +138,65 @@ const MapModal = ({ isOpen, onClose, onConfirm }) => {
             </div>
           </div>
           <button onClick={onClose} className="p-2 hover:bg-gray-200 rounded-full transition-colors text-gray-400">✕</button>
+        </div>
+
+        {/* Search Bar */}
+        <div className="px-6 py-3.5 border-b border-gray-100 bg-white relative z-50">
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Search for your address or locality..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-10 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-4 focus:ring-primary/5 focus:border-primary outline-none font-bold text-xs text-gray-800 placeholder-gray-400 font-outfit transition-all duration-200"
+            />
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+            {(searchQuery || searching) && (
+              <div className="absolute right-3.5 top-1/2 -translate-y-1/2 flex items-center gap-2">
+                {searching && <Loader2 size={14} className="animate-spin text-gray-400" />}
+                {searchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSearchQuery('');
+                      setSuggestions([]);
+                    }}
+                    className="p-1 hover:bg-gray-200 rounded-full text-gray-400 transition-colors"
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Autocomplete Suggestions */}
+          {suggestions.length > 0 && (
+            <div className="absolute left-6 right-6 top-[calc(100%-2px)] bg-white border border-gray-100 shadow-2xl rounded-2xl overflow-hidden z-[2000] divide-y divide-gray-50 max-h-60 overflow-y-auto">
+              {suggestions.map((suggestion) => (
+                <button
+                  key={suggestion.place_id}
+                  type="button"
+                  onClick={() => {
+                    const lat = parseFloat(suggestion.lat);
+                    const lon = parseFloat(suggestion.lon);
+                    const newPos = new L.LatLng(lat, lon);
+                    setPosition(newPos);
+                    setMapCenter([lat, lon]);
+                    setAddress(suggestion.display_name);
+                    setSearchQuery('');
+                    setSuggestions([]);
+                  }}
+                  className="w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors flex items-start gap-2.5"
+                >
+                  <MapPin className="text-gray-400 shrink-0 mt-0.5" size={14} />
+                  <span className="text-[11px] font-bold text-gray-600 line-clamp-2 leading-relaxed font-outfit">
+                    {suggestion.display_name}
+                  </span>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Quick Selection Presets */}
