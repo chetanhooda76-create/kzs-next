@@ -1,4 +1,37 @@
-import Image from "next/image";
+import Navbar from "@/components/Navbar";
+import Hero from "@/components/Hero";
+import PickupSection from "@/components/PickupSection";
+import ProcessSection from "@/components/ProcessSection";
+import RecycleSection from "@/components/RecycleSection";
+import PriceSection from "@/components/PriceSection";
+import Testimonials from "@/components/Testimonials";
+import Footer from "@/components/Footer";
+
+export default function Home() {
+  return (
+    <>
+      <Navbar />
+      <Hero />
+      <PickupSection />
+      <ProcessSection />
+      <RecycleSection />
+      <PriceSection />
+      <Testimonials />
+      <Footer />
+    </>
+  );
+}
+
+
+
+
+
+
+
+
+
+
+/*import Image from "next/image";
 
 export default function Home() {
   return (
@@ -62,4 +95,4 @@ export default function Home() {
       </main>
     </div>
   );
-}
+}*/
