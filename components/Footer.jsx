@@ -1,6 +1,6 @@
 import Logo from './Logo';
-import { Mail, MapPin, Phone, MessageCircle } from 'lucide-react';
-import { FaInstagram, FaFacebookF } from 'react-icons/fa';
+import { MapPin, Phone } from 'lucide-react';
+import { FaInstagram, FaFacebookF, FaWhatsapp, FaEnvelope } from 'react-icons/fa';
 import Link from 'next/link';
 
 const Footer = () => {
@@ -28,7 +28,7 @@ const Footer = () => {
               <a href="tel:+9198712110540" className="flex gap-3 hover:text-white transition-all items-center"><Phone size={16} className="text-[#007AFF]" /> +91 98712 110540</a>
               <a href="tel:+918287873624" className="flex gap-3 hover:text-white transition-all items-center"><Phone size={16} className="text-[#007AFF]" /> +91 82878 73624</a>
               <a href="tel:+919318474695" className="flex gap-3 hover:text-white transition-all items-center"><Phone size={16} className="text-[#007AFF]" /> +91 93184 74695</a>
-              <a href="https://wa.me/919318474695" target="_blank" className="flex gap-3 items-center hover:text-white transition-all"><MessageCircle size={16} className="text-[#25D366]" /> WhatsApp Available 24/7</a>
+              <a href="https://wa.me/919318474695" target="_blank" className="flex gap-3 items-center hover:text-white transition-all"><FaWhatsapp size={16} className="text-[#25D366]" /> WhatsApp Available 24/7</a>
             </div>
           </div>
           
@@ -38,8 +38,8 @@ const Footer = () => {
             <div className="flex gap-4">
               <a href="https://www.instagram.com/kzsmalik/" target="_blank" className="w-10 h-10 bg-[#E4405F] text-white rounded-full flex items-center justify-center transition-all hover:scale-110 active:scale-95 shadow-lg shadow-[#E4405F]/20" title="Instagram"><FaInstagram size={18} /></a>
               <a href="https://www.facebook.com/profile.php?id=61563159184319" target="_blank" className="w-10 h-10 bg-[#1877F2] text-white rounded-full flex items-center justify-center transition-all hover:scale-110 active:scale-95 shadow-lg shadow-[#1877F2]/20" title="Facebook"><FaFacebookF size={18} /></a>
-              <a href="https://wa.me/919318474695" target="_blank" className="w-10 h-10 bg-[#25D366] text-white rounded-full flex items-center justify-center transition-all hover:scale-110 active:scale-95 shadow-lg shadow-[#25D366]/20" title="WhatsApp"><MessageCircle size={18} /></a>
-              <a href="mailto:kzsmalik400@gmail.com" className="w-10 h-10 bg-[#EA4335] text-white rounded-full flex items-center justify-center transition-all hover:scale-110 active:scale-95 shadow-lg shadow-[#EA4335]/20" title="Email"><Mail size={18} /></a>
+              <a href="https://wa.me/919318474695" target="_blank" className="w-10 h-10 bg-[#25D366] text-white rounded-full flex items-center justify-center transition-all hover:scale-110 active:scale-95 shadow-lg shadow-[#25D366]/20" title="WhatsApp"><FaWhatsapp size={18} /></a>
+              <a href="mailto:kzsmalik400@gmail.com" className="w-10 h-10 bg-[#EA4335] text-white rounded-full flex items-center justify-center transition-all hover:scale-110 active:scale-95 shadow-lg shadow-[#EA4335]/20" title="Email"><FaEnvelope size={18} /></a>
             </div>
           </div>
         </div>
