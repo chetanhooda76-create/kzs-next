@@ -6,39 +6,46 @@ const ScrapRatesPage = () => {
     {
       name: 'AC (2 Ton)',
       unit: '/unit',
-      image: '/split_ac.png',
+      image: '/hero_split_ac.png',
+      price: '4,500',
     },
     {
       name: 'AC (1.5 Ton)',
       unit: '/unit',
-      image: '/window_ac.png',
+      image: '/hero_window_ac.png',
+      price: '3,800',
     },
     {
       name: 'AC (1 Ton)',
       unit: '/unit',
       image:
         'https://images.unsplash.com/photo-1590756254933-2873d72a83b6?auto=format&fit=crop&q=80&w=600',
+      price: '3,000',
     },
     {
       name: 'Laptop & Computer',
       unit: '/unit',
       image: '/computer_scrap.png',
+      price: '1,200',
     },
     {
       name: 'Mobile & Tablet',
       unit: '/unit',
       image:
         'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&q=80&w=600',
+      price: '1,000',
     },
     {
       name: 'Battery Scrap',
       unit: '/kg',
       image: '/battery_scrap.png',
+      price: '1,500',
     },
     {
       name: 'Electronic Scraps',
       unit: '/kg',
       image: '/electronic_scrap.png',
+      price: '1,800',
     },
   ];
 
@@ -48,22 +55,26 @@ const ScrapRatesPage = () => {
       unit: '/unit',
       image:
         'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&q=80&w=600',
+      price: '8,500',
     },
     {
       name: 'Bulk Laptop/PC',
       unit: '/unit',
       image: '/bulk_laptops.png',
+      price: '7,500',
     },
     {
       name: 'Industrial Battery',
       unit: '/kg',
       image: '/industrial_battery.png',
+      price: '6,500',
     },
     {
       name: 'Corporate E-Waste',
       unit: '/kg',
       image:
         'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&q=80&w=600',
+      price: '5,500',
     },
   ];
 
@@ -139,10 +150,10 @@ const ScrapRatesPage = () => {
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                     />
                   </div>
-                  <div className="mt-4 flex items-center gap-1 text-gray-700 font-medium">
-                    <span className="text-lg">₹</span>
-                    <span className="inline-block w-10" />
-                    <span className="text-sm">{item.unit}</span>
+                  <div className="mt-4 flex items-center gap-1 text-gray-700 font-semibold">
+                    <span className="text-lg font-bold text-primary">₹</span>
+                    <span className="text-lg font-bold text-gray-900">{item.price}</span>
+                    <span className="text-sm text-gray-500 font-normal">{item.unit}</span>
                   </div>
                 </div>
               ))}
@@ -167,10 +178,10 @@ const ScrapRatesPage = () => {
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                     />
                   </div>
-                  <div className="mt-4 flex items-center gap-1 text-gray-700 font-medium">
-                    <span className="text-lg">₹</span>
-                    <span className="inline-block w-10" />
-                    <span className="text-sm">{item.unit}</span>
+                  <div className="mt-4 flex items-center gap-1 text-gray-700 font-semibold">
+                    <span className="text-lg font-bold text-primary">₹</span>
+                    <span className="text-lg font-bold text-gray-900">{item.price}</span>
+                    <span className="text-sm text-gray-500 font-normal">{item.unit}</span>
                   </div>
                 </div>
               ))}
