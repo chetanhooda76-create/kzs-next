@@ -1,12 +1,17 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Logo from './Logo';
 import { Menu, X } from 'lucide-react';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
+
+  useEffect(() => {
+    setIsUserLoggedIn(!!localStorage.getItem('userToken'));
+  }, []);
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-100 h-20 flex items-center">
@@ -22,6 +27,28 @@ const Navbar = () => {
         </div>
 
         <div className="hidden lg:flex items-center gap-6">
+          {isUserLoggedIn ? (
+            <>
+              <Link href="/user-dashboard" className="text-gray-600 hover:text-primary transition-colors text-sm font-bold uppercase tracking-tight">
+                My Account
+              </Link>
+              <button
+                onClick={() => {
+                  localStorage.removeItem('userToken');
+                  localStorage.removeItem('userData');
+                  window.location.href = '/';
+                }}
+                className="text-red-500 hover:text-red-700 transition-colors text-sm font-bold uppercase tracking-tight"
+              >
+                Logout
+              </button>
+            </>
+          ) : (
+            <Link href="/login" className="text-gray-600 hover:text-primary transition-colors text-sm font-bold uppercase tracking-tight">
+              Sign In
+            </Link>
+          )}
+
           <Link href="/#schedule"
             className="bg-secondary hover:bg-secondary-hover text-black px-8 py-3.5 rounded-2xl font-bold text-sm transition-all shadow-xl shadow-secondary/10 hover:scale-105 active:scale-95">
             Schedule Pickup
@@ -63,7 +90,24 @@ const Navbar = () => {
           </div>
           <hr />
           <div className="space-y-4">
-            <Link href="/#schedule" className="btn-secondary w-full py-3 text-xs font-bold" onClick={() => setIsMenuOpen(false)}>Schedule a Pickup</Link>
+            {isUserLoggedIn ? (
+              <>
+                <Link href="/user-dashboard" className="btn-secondary w-full py-3 text-xs font-bold block text-center" onClick={() => setIsMenuOpen(false)}>My Account</Link>
+                <button
+                  onClick={() => {
+                    localStorage.removeItem('userToken');
+                    localStorage.removeItem('userData');
+                    window.location.href = '/';
+                  }}
+                  className="w-full py-3 text-xs font-bold text-red-500 hover:text-red-700 border border-red-200 rounded-2xl bg-red-50/50"
+                >
+                  Logout
+                </button>
+              </>
+            ) : (
+              <Link href="/login" className="btn-secondary w-full py-3 text-xs font-bold block text-center" onClick={() => setIsMenuOpen(false)}>Sign In</Link>
+            )}
+            <Link href="/#schedule" className="btn-primary w-full py-3 text-xs font-bold block text-center" onClick={() => setIsMenuOpen(false)}>Schedule a Pickup</Link>
           </div>
         </div>
       )}

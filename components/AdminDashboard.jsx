@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
-import { Package, Truck, CheckCircle, XCircle, LogOut, Trash, ExternalLink, Menu, X, Globe, BarChart3 } from 'lucide-react';
+import { Package, Truck, CheckCircle, XCircle, LogOut, Trash, ExternalLink, Menu, X, Globe, BarChart3, TrendingUp, Edit } from 'lucide-react';
 import AdminLogin from './AdminLogin';
 import AdminAnalytics from './AdminAnalytics';
 import API_BASE_URL from '../apiConfig';
@@ -34,6 +34,17 @@ const AdminDashboard = () => {
     author: 'KZS Malik'
   });
 
+  const [scrapItems, setScrapItems] = useState([]);
+  const [isRatesModalOpen, setIsRatesModalOpen] = useState(false);
+  const [editingRate, setEditingRate] = useState(null);
+  const [ratesFormData, setRatesFormData] = useState({
+    name: '',
+    unit: '/unit',
+    price: '',
+    category: 'household'
+  });
+  const [rateImageFile, setRateImageFile] = useState(null);
+
   const fetchPickups = useCallback(async () => {
     try {
       const res = await axios.get(`${API_BASE_URL}/api/admin/pickups`);
@@ -53,6 +64,20 @@ const AdminDashboard = () => {
       const res = await axios.get(`${API_BASE_URL}/api/seo`);
       if (res.data.success) {
         setSeoList(res.data.data);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const fetchScrapItems = useCallback(async () => {
+    try {
+      setLoading(true);
+      const res = await axios.get(`${API_BASE_URL}/api/scrap-items`);
+      if (res.data.success) {
+        setScrapItems(res.data.data);
       }
     } catch (err) {
       console.error(err);
@@ -93,6 +118,8 @@ const AdminDashboard = () => {
     const loadData = async () => {
       if (activeTab === 'seo') {
         await fetchSeo();
+      } else if (activeTab === 'rates') {
+        await fetchScrapItems();
       } else if (activeTab === 'analytics') {
         setLoading(false);
       } else {
@@ -101,7 +128,7 @@ const AdminDashboard = () => {
     };
 
     loadData();
-  }, [isAuthenticated, activeTab, fetchSeo, fetchPickups]);
+  }, [isAuthenticated, activeTab, fetchSeo, fetchPickups, fetchScrapItems]);
 
   const saveSeo = async (e) => {
     e.preventDefault();
@@ -138,6 +165,97 @@ const AdminDashboard = () => {
       setSeoFormData({ page: '', title: '', description: '', keywords: '', author: 'KZS Malik' });
     }
     setIsSeoModalOpen(true);
+  };
+
+  const openRatesModal = (rate = null) => {
+    if (rate) {
+      setEditingRate(rate);
+      setRatesFormData({
+        name: rate.name,
+        unit: rate.unit,
+        price: rate.price,
+        category: rate.category
+      });
+    } else {
+      setEditingRate(null);
+      setRatesFormData({ name: '', unit: '/unit', price: '', category: 'household' });
+    }
+    setRateImageFile(null);
+    setIsRatesModalOpen(true);
+  };
+
+  const saveRate = async (e) => {
+    e.preventDefault();
+    
+    const token = localStorage.getItem('adminToken');
+    if (!token) return;
+
+    const fd = new FormData();
+    fd.append('name', ratesFormData.name);
+    fd.append('unit', ratesFormData.unit);
+    fd.append('price', ratesFormData.price);
+    fd.append('category', ratesFormData.category);
+    if (rateImageFile) {
+      fd.append('image', rateImageFile);
+    }
+
+    try {
+      setLoading(true);
+      let res;
+      if (editingRate) {
+        res = await axios.put(`${API_BASE_URL}/api/admin/scrap-items/${editingRate._id}`, fd, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            Authorization: `Bearer ${token}`
+          }
+        });
+      } else {
+        if (!rateImageFile) {
+          alert('Please select an image for the new scrap item');
+          setLoading(false);
+          return;
+        }
+        res = await axios.post(`${API_BASE_URL}/api/admin/scrap-items`, fd, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            Authorization: `Bearer ${token}`
+          }
+        });
+      }
+
+      if (res.data.success) {
+        alert(editingRate ? 'Scrap rate updated' : 'Scrap rate created');
+        setIsRatesModalOpen(false);
+        fetchScrapItems();
+      }
+    } catch (err) {
+      console.error(err);
+      alert(err.response?.data?.message || 'Failed to save scrap rate');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const deleteRate = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this scrap rate?')) return;
+    
+    const token = localStorage.getItem('adminToken');
+    if (!token) return;
+
+    try {
+      setLoading(true);
+      const res = await axios.delete(`${API_BASE_URL}/api/admin/scrap-items/${id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.data.success) {
+        fetchScrapItems();
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Failed to delete scrap rate');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const deletePickup = async (id, type) => {
@@ -269,6 +387,7 @@ const AdminDashboard = () => {
             {[
               { id: 'household', label: 'Household', icon: <Package size={20} /> },
               { id: 'business', label: 'Business', icon: <Truck size={20} /> },
+              { id: 'rates', label: 'Scrap Rates', icon: <TrendingUp size={20} /> },
               { id: 'analytics', label: 'Analytics', icon: <BarChart3 size={20} /> },
               { id: 'seo', label: 'SEO Manager', icon: <Globe size={20} /> },
             ].map((tab) => (
@@ -315,6 +434,8 @@ const AdminDashboard = () => {
                 ? 'Household Requests'
                 : activeTab === 'business'
                 ? 'Business Requests'
+                : activeTab === 'rates'
+                ? 'Scrap Rates Manager'
                 : 'SEO Management'}
             </h2>
           </div>
@@ -378,6 +499,66 @@ const AdminDashboard = () => {
                           <div className="flex justify-end gap-2">
                             <button onClick={() => openSeoModal(s)} className="p-2 text-primary hover:bg-primary/10 rounded-lg transition-all"><ExternalLink size={16}/></button>
                             <button onClick={() => deleteSeo(s._id)} className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-all"><Trash size={16}/></button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          ) : activeTab === 'rates' ? (
+            <div className="space-y-6">
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <p className="text-[10px] md:text-sm text-gray-500 font-medium font-lexend max-w-xs md:max-w-none">Manage your scrap rates catalog, pricing, and category divisions.</p>
+                <button 
+                  onClick={() => openRatesModal()}
+                  className="w-fit md:w-auto px-6 py-2.5 md:py-3.5 bg-primary text-white rounded-xl font-black text-[10px] md:text-sm shadow-xl shadow-primary/20 hover:scale-105 transition-all whitespace-nowrap uppercase tracking-widest font-outfit"
+                >
+                  Create Scrap Rate
+                </button>
+              </div>
+
+              <div className="bg-white rounded-3xl border border-gray-100 overflow-hidden shadow-sm">
+                <table className="w-full text-left font-outfit">
+                  <thead className="bg-gray-50 border-b border-gray-100">
+                    <tr>
+                      <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest font-outfit">Image</th>
+                      <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest font-outfit">Item Details</th>
+                      <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest font-outfit">Category</th>
+                      <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest font-outfit">Price / Unit</th>
+                      <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest font-outfit text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-50">
+                    {scrapItems.length === 0 ? (
+                      <tr>
+                        <td colSpan="5" className="px-6 py-12 text-center text-gray-400 font-bold font-outfit uppercase tracking-widest text-xs">No scrap rates configured yet.</td>
+                      </tr>
+                    ) : scrapItems.map((item) => (
+                      <tr key={item._id} className="hover:bg-gray-50/50 transition-colors">
+                        <td className="px-6 py-4">
+                          <img
+                            src={resolveImgSrc(item.image)}
+                            className="w-12 h-12 object-cover rounded-xl border border-gray-100 shadow-sm"
+                            alt={item.name}
+                          />
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className="font-bold text-gray-900 text-sm">{item.name}</span>
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className={`text-[9px] font-black uppercase py-1 px-3.5 rounded-full ${item.category === 'household' ? 'bg-primary/10 text-primary' : 'bg-secondary/20 text-secondary-dark'}`}>
+                            {item.category}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 font-bold text-gray-700">
+                          ₹{item.price} <span className="text-xs text-gray-400 font-normal">{item.unit}</span>
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          <div className="flex justify-end gap-2">
+                            <button onClick={() => openRatesModal(item)} className="p-2 text-primary hover:bg-primary/10 rounded-lg transition-all" title="Edit"><Edit size={16}/></button>
+                            <button onClick={() => deleteRate(item._id)} className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-all" title="Delete"><Trash size={16}/></button>
                           </div>
                         </td>
                       </tr>
@@ -517,6 +698,92 @@ const AdminDashboard = () => {
 
                 <button type="submit" className="w-full py-3 md:py-4 bg-primary text-white rounded-xl font-black text-xs md:text-lg shadow-xl shadow-primary/20 hover:scale-[1.02] transition-all">
                   {editingSeo ? 'Update Settings' : 'Save SEO Configuration'}
+                </button>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* Scrap Rates Modal */}
+        {isRatesModalOpen && (
+          <div className="fixed inset-0 z-100 flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm animate-in fade-in duration-200">
+            <div className="bg-white w-full max-w-lg rounded-3xl md:rounded-[2.5rem] shadow-2xl overflow-hidden border border-gray-100 animate-in zoom-in-95 duration-200">
+              <div className="p-5 md:p-8 border-b border-gray-50 flex justify-between items-center bg-gray-50/50">
+                <div>
+                  <h3 className="text-sm md:text-xl font-black text-gray-900 uppercase tracking-tight font-outfit">{editingRate ? 'Edit Scrap Rate' : 'Create Scrap Rate'}</h3>
+                  <p className="text-[9px] md:text-xs text-gray-400 font-bold uppercase tracking-widest mt-1">Configure item pricing & assets</p>
+                </div>
+                <button onClick={() => setIsRatesModalOpen(false)} className="w-8 h-8 flex items-center justify-center rounded-xl bg-white shadow-sm border border-gray-100 text-gray-400 hover:text-gray-900 transition-all font-outfit font-black">
+                  ✕
+                </button>
+              </div>
+              
+              <form onSubmit={saveRate} className="p-5 md:p-8 space-y-4 md:space-y-5 text-left font-outfit">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1.5 col-span-1">
+                    <label className="text-[9px] md:text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Category</label>
+                    <select
+                      className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/10 outline-none font-bold text-xs appearance-none cursor-pointer"
+                      value={ratesFormData.category}
+                      onChange={(e) => setRatesFormData({ ...ratesFormData, category: e.target.value })}
+                      required
+                    >
+                      <option value="household">Household</option>
+                      <option value="business">Business & Industrial</option>
+                    </select>
+                  </div>
+                  <div className="space-y-1.5 col-span-1">
+                    <label className="text-[9px] md:text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Price</label>
+                    <input 
+                      type="text"
+                      className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/10 outline-none font-bold text-xs"
+                      placeholder="e.g. 4,500"
+                      value={ratesFormData.price}
+                      onChange={(e) => setRatesFormData({...ratesFormData, price: e.target.value})}
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1.5 col-span-1">
+                    <label className="text-[9px] md:text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Item Name</label>
+                    <input 
+                      type="text"
+                      className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/10 outline-none font-bold text-xs"
+                      placeholder="e.g. AC (2 Ton)"
+                      value={ratesFormData.name}
+                      onChange={(e) => setRatesFormData({...ratesFormData, name: e.target.value})}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-1.5 col-span-1">
+                    <label className="text-[9px] md:text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Unit</label>
+                    <select
+                      className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/10 outline-none font-bold text-xs appearance-none cursor-pointer"
+                      value={ratesFormData.unit}
+                      onChange={(e) => setRatesFormData({ ...ratesFormData, unit: e.target.value })}
+                      required
+                    >
+                      <option value="/unit">/unit</option>
+                      <option value="/kg">/kg</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-[9px] md:text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Scrap Image</label>
+                  <input 
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => setRateImageFile(e.target.files[0])}
+                    className="w-full text-xs font-bold text-gray-500 bg-gray-50 border border-gray-200 p-2.5 rounded-xl cursor-pointer"
+                    required={!editingRate}
+                  />
+                </div>
+
+                <button type="submit" className="w-full py-3.5 bg-primary text-white rounded-xl font-black text-xs uppercase tracking-widest shadow-xl shadow-primary/20 hover:scale-[1.02] transition-all">
+                  {editingRate ? 'Update Scrap Item' : 'Create Scrap Item'}
                 </button>
               </form>
             </div>
