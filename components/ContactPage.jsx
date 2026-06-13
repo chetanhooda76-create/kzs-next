@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from 'react';
-import { MapPin, Phone, Mail, MessageCircle, Send } from 'lucide-react';
+import { MapPin, Phone, Send } from 'lucide-react';
+import { FaWhatsapp, FaEnvelope } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 
 const ContactPage = () => {
@@ -60,34 +61,34 @@ const ContactPage = () => {
                 target="_blank"
                 className="bg-white border-2 border-gray-100 hover:border-primary/20 text-gray-700 px-3 py-2 md:px-5 md:py-3 rounded-xl font-bold text-[10px] md:text-base transition-all shadow-sm inline-flex items-center justify-center gap-1.5 flex-1 whitespace-nowrap"
               >
-                <MessageCircle size={14} className="text-[#25D366]" />
-                WhatsApp
-              </a>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Contact Cards Section */}
-      <section className="container mx-auto px-4 -mt-16 mb-12">
-        <div className="grid md:grid-cols-3 gap-6">
-          {[
-            { 
-              icon: <Phone className="text-white" />, 
-              label: 'Call Us', 
-              value: (
-                <div className="flex flex-col gap-1">
-                  <span>+91 93184 74695</span>
-                  <span>+91 82878 73624</span>
-                  <span>+91 98712 110540</span>
-                </div>
-              ), 
-              bg: 'bg-[#16A34A]', 
-              link: 'tel:+918287873624' 
-            },
-            { icon: <MessageCircle className="text-white" />, label: 'WhatsApp', value: '+91 93184 74695', bg: 'bg-[#25D366]', link: 'https://wa.me/919318474695' },
-            { icon: <Mail className="text-white" />, label: 'Email Support', value: 'info@kzsmalik.com', bg: 'bg-[#EA4335]', link: 'mailto:info@kzsmalik.com' },
-          ].map((card, i) => (
+                 <FaWhatsapp size={14} className="text-[#25D366]" />
+                 WhatsApp
+               </a>
+             </div>
+           </div>
+         </div>
+       </section>
+ 
+       {/* Contact Cards Section */}
+       <section className="container mx-auto px-4 -mt-16 mb-12">
+         <div className="grid md:grid-cols-3 gap-6">
+           {[
+             { 
+               icon: <Phone className="text-white" />, 
+               label: 'Call Us', 
+               value: (
+                 <div className="flex flex-col gap-1">
+                   <span>+91 93184 74695</span>
+                   <span>+91 82878 73624</span>
+                   <span>+91 98712 110540</span>
+                 </div>
+               ), 
+               bg: 'bg-[#16A34A]', 
+               link: 'tel:+918287873624' 
+             },
+             { icon: <FaWhatsapp className="text-white" size={24} />, label: 'WhatsApp', value: '+91 93184 74695', bg: 'bg-[#25D366]', link: 'https://wa.me/919318474695' },
+             { icon: <FaEnvelope className="text-white" size={24} />, label: 'Email Support', value: 'info@kzsmalik.com', bg: 'bg-[#EA4335]', link: 'mailto:info@kzsmalik.com' },
+           ].map((card, i) => (
             <motion.a 
               key={i}
               href={card.link}
