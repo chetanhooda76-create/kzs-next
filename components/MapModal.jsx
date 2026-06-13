@@ -226,7 +226,7 @@ const MapModal = ({ isOpen, onClose, onConfirm }) => {
           })}
         </div>
 
-        <div className="h-100 relative">
+        <div className="h-100 relative z-10">
           <MapContainer center={[28.6139, 77.2090]} zoom={13} scrollWheelZoom={true} style={{ height: '100%', width: '100%' }}>
             <ChangeView center={mapCenter} />
             <TileLayer
