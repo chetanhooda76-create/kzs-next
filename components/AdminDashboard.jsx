@@ -46,8 +46,12 @@ const AdminDashboard = () => {
   const [rateImageFile, setRateImageFile] = useState(null);
 
   const fetchPickups = useCallback(async () => {
+    const token = localStorage.getItem('adminToken');
+    if (!token) return;
     try {
-      const res = await axios.get(`${API_BASE_URL}/api/admin/pickups`);
+      const res = await axios.get(`${API_BASE_URL}/api/admin/pickups`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       if (res.data.success) {
         setPickups(res.data.data);
       }
@@ -260,8 +264,12 @@ const AdminDashboard = () => {
 
   const deletePickup = async (id, type) => {
     if (!window.confirm('Are you sure you want to delete this request?')) return;
+    const token = localStorage.getItem('adminToken');
+    if (!token) return;
     try {
-      await axios.delete(`${API_BASE_URL}/api/admin/pickups/${type}/${id}`);
+      await axios.delete(`${API_BASE_URL}/api/admin/pickups/${type}/${id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       fetchPickups();
     } catch (err) {
       console.error(err);
@@ -269,8 +277,13 @@ const AdminDashboard = () => {
   };
 
   const updateStatus = async (id, type, status) => {
+    const token = localStorage.getItem('adminToken');
+    if (!token) return;
     try {
-      await axios.put(`${API_BASE_URL}/api/admin/pickups`, { id, type, status });
+      await axios.put(`${API_BASE_URL}/api/admin/pickups`, 
+        { id, type, status },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
       fetchPickups();
     } catch (err) {
       console.error(err);
