@@ -81,6 +81,18 @@ const PickupSection = () => {
       formDataToSend.append('service', formData.service === 'Other' ? formData.otherService : formData.service);
       formDataToSend.append('address', `${formData.streetAddress}, ${formData.city}, ${formData.state} - ${formData.pincode} (${formData.label})`);
       
+      const userData = localStorage.getItem('userData');
+      if (userData) {
+        try {
+          const parsed = JSON.parse(userData);
+          if (parsed.email) {
+            formDataToSend.append('email', parsed.email);
+          }
+        } catch (error) {
+          console.error("Error parsing user data:", error);
+        }
+      }
+
       if (formData.coords) {
         formDataToSend.append('coords', JSON.stringify(formData.coords));
       }
