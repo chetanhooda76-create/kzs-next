@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/db';
 import User from '@/models/User';
+import Admin from '@/models/Admin';
 import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET!;
@@ -19,11 +20,36 @@ export async function POST(req: Request) {
 
     const normalizedEmail = String(email).trim().toLowerCase();
 
-    const user = await User.findOne({ email: normalizedEmail });
+    let user = await User.findOne({ email: normalizedEmail });
+    
+    // If user is not found, check if this email exists in the Admin collection
     if (!user) {
+      const admin = await Admin.findOne({ email: normalizedEmail });
+      if (!admin) {
+        return NextResponse.json(
+          { success: false, message: 'Invalid credentials' },
+          { status: 401 }
+        );
+      }
+
+      const isMatch = await admin.comparePassword(password);
+      if (!isMatch) {
+        return NextResponse.json(
+          { success: false, message: 'Invalid credentials' },
+          { status: 401 }
+        );
+      }
+
+      const token = jwt.sign({ id: admin._id }, JWT_SECRET, { expiresIn: '7d' });
+
       return NextResponse.json(
-        { success: false, message: 'Invalid credentials' },
-        { status: 401 }
+        {
+          success: true,
+          token,
+          isAdmin: true,
+          message: 'Logged in successfully',
+        },
+        { status: 200 }
       );
     }
 
@@ -45,6 +71,7 @@ export async function POST(req: Request) {
       {
         success: true,
         token,
+        isAdmin: false,
         user: { name: user.name, email: user.email },
         message: 'Logged in successfully',
       },
@@ -58,3 +85,4 @@ export async function POST(req: Request) {
     );
   }
 }
+

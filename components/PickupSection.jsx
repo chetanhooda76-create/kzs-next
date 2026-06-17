@@ -73,6 +73,10 @@ const PickupSection = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!formData.coords) {
+      alert('please search or tap your location on the map');
+      return;
+    }
     try {
       const formDataToSend = new FormData();
       formDataToSend.append('name', formData.name);
@@ -159,7 +163,7 @@ const PickupSection = () => {
 
               <div className="grid md:grid-cols-2 gap-2.5 md:gap-6">
                 <div className="space-y-1 md:space-y-1.5">
-                  <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 font-lexend">Full Name</label>
+                  <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 font-lexend">Full Name <span className="text-red-500">*</span></label>
                   <input 
                     type="text" 
                     placeholder="Enter your name"
@@ -171,7 +175,7 @@ const PickupSection = () => {
                 </div>
 
                 <div className="space-y-1 md:space-y-1.5">
-                  <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 font-lexend">Phone Number</label>
+                  <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 font-lexend">Phone Number <span className="text-red-500">*</span></label>
                   <input 
                     type="tel" 
                     placeholder="Enter 10 digit number"
@@ -183,7 +187,7 @@ const PickupSection = () => {
                 </div>
 
                 <div className="md:col-span-2 space-y-1.5">
-                  <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 font-lexend">Select Service</label>
+                  <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 font-lexend">Select Service <span className="text-red-500">*</span></label>
                   <select 
                     className="w-full px-3 py-2 md:px-5 md:py-3.5 bg-gray-50 border border-gray-200 rounded-lg md:rounded-2xl focus:ring-4 focus:ring-primary/5 focus:border-primary outline-none transition-all font-bold font-lexend text-gray-800 appearance-none cursor-pointer text-[11px] md:text-xs"
                     value={formData.service}
@@ -229,7 +233,7 @@ const PickupSection = () => {
                     />
                   </div>
                   <div className="space-y-1 md:space-y-1.5">
-                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 font-lexend">Street Address</label>
+                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 font-lexend">Street Address <span className="text-red-500">*</span></label>
                     <input 
                       type="text" 
                       placeholder="House No, Area..."
@@ -241,7 +245,7 @@ const PickupSection = () => {
                   </div>
                   <div className="md:col-span-2 grid grid-cols-3 gap-2 md:gap-3">
                     <div className="space-y-1 md:space-y-1.5">
-                      <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 font-lexend">City</label>
+                      <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 font-lexend">City <span className="text-red-500">*</span></label>
                       <input
                         type="text"
                         className="w-full px-3 py-2 md:px-5 md:py-3.5 bg-gray-50 border border-gray-200 rounded-lg md:rounded-2xl focus:ring-4 focus:ring-primary/5 outline-none font-bold font-lexend text-gray-800 text-[11px] md:text-xs"
@@ -251,7 +255,7 @@ const PickupSection = () => {
                       />
                     </div>
                     <div className="space-y-1 md:space-y-1.5">
-                      <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 font-lexend">State</label>
+                      <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 font-lexend">State <span className="text-red-500">*</span></label>
                       <input
                         type="text"
                         className="w-full px-3 py-2 md:px-5 md:py-3.5 bg-gray-50 border border-gray-200 rounded-lg md:rounded-2xl focus:ring-4 focus:ring-primary/5 outline-none font-bold font-lexend text-gray-800 text-[11px] md:text-xs"
@@ -261,7 +265,7 @@ const PickupSection = () => {
                       />
                     </div>
                     <div className="space-y-1 md:space-y-1.5">
-                      <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 font-lexend">Pincode</label>
+                      <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 font-lexend">Pincode <span className="text-red-500">*</span></label>
                       <input
                         type="text"
                         className="w-full px-3 py-2 md:px-5 md:py-3.5 bg-gray-50 border border-gray-200 rounded-lg md:rounded-2xl focus:ring-4 focus:ring-primary/5 outline-none font-bold font-lexend text-gray-800 text-[11px] md:text-xs"
@@ -284,7 +288,7 @@ const PickupSection = () => {
                     </div>
                     <div>
                       <h4 className="font-bold text-gray-900 uppercase tracking-wider text-[9px] md:text-[10px] font-lexend">
-                        {formData.coords ? 'LOCATION PINNED' : 'PINPOINT ON MAP'}
+                        {formData.coords ? 'LOCATION PINNED' : 'PINPOINT ON MAP'} <span className="text-red-500">*</span>
                       </h4>
                       <p className="text-[9px] md:text-[10px] font-bold text-gray-400 mt-0.5 md:mt-1 uppercase font-lexend">
                         {formData.coords ? `${formData.city || 'Area Captured'}` : 'Find your doorstep exactly'}

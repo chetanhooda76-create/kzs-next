@@ -23,9 +23,14 @@ const UserLogin = () => {
       });
 
       if (response.data.success && response.data.token) {
-        localStorage.setItem('userToken', response.data.token);
-        localStorage.setItem('userData', JSON.stringify(response.data.user));
-        window.location.href = '/user-dashboard';
+        if (response.data.isAdmin) {
+          localStorage.setItem('adminToken', response.data.token);
+          window.location.href = '/admin';
+        } else {
+          localStorage.setItem('userToken', response.data.token);
+          localStorage.setItem('userData', JSON.stringify(response.data.user));
+          window.location.href = '/user-dashboard';
+        }
       } else {
         setError(response.data.message || 'Something went wrong');
       }
@@ -35,6 +40,7 @@ const UserLogin = () => {
       setLoading(false);
     }
   };
+
 
   return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">

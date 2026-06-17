@@ -63,7 +63,10 @@ const AdminAnalytics = () => {
 
   const fetchPickups = async () => {
     try {
-      const res = await axios.get(`${API_BASE_URL}/api/admin/pickups`);
+      const token = localStorage.getItem('adminToken');
+      const res = await axios.get(`${API_BASE_URL}/api/admin/pickups`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       if (res.data.success) {
         setPickups(res.data.data);
         setLastUpdated(new Date());
@@ -79,7 +82,10 @@ const AdminAnalytics = () => {
     let isMounted = true;
     (async () => {
       try {
-        const res = await axios.get(`${API_BASE_URL}/api/admin/pickups`);
+        const token = localStorage.getItem('adminToken');
+        const res = await axios.get(`${API_BASE_URL}/api/admin/pickups`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
         if (isMounted && res.data.success) {
           setPickups(res.data.data);
           setLastUpdated(new Date());
@@ -96,6 +102,7 @@ const AdminAnalytics = () => {
       clearInterval(id);
     };
   }, []);
+
 
   // Close filter popover on outside click
   useEffect(() => {
